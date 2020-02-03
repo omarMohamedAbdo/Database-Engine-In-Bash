@@ -1,0 +1,31 @@
+#!/bin/bash
+echo "Choose command"
+
+
+show_menu(){
+select c in 'Show all databases' 'Create new database' 'connect to database' 'Exit'
+do
+if [[ $c = "Show all databases" ]] 
+then
+ls data
+break;
+elif [[ $c = "Create new database" ]] 
+then
+echo "Enter database name"
+read dbName;
+mkdir "data/$dbName"
+break;
+elif [[ $c = "connect to database" ]] 
+then
+. ./connectToDatabase
+break 
+elif [[ $c = "Exit" ]] 
+then
+exit
+fi
+done
+}
+while true
+do
+show_menu
+done

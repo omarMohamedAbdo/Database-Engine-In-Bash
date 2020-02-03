@@ -1,0 +1,28 @@
+#!/bin/bash
+Database=${opt}
+echo $Database
+show_menu(){
+select c in 'List all tables' 'Create new table' 'insert into table' 'Select from table' 'Delete from table' 'Exit'
+do
+if [[ $c = "List all tables" ]] 
+then
+ls  "data/$Database"
+break;
+elif [[ $c = "Create new table" ]] 
+then
+cd "data/$Database"
+echo "please Enter the name of table"
+read name;
+touch $name;
+touch ".$name.metadata";
+break;
+elif [[ $c = "Exit" ]] 
+then
+. ./connectToDatabase 
+fi
+done
+}
+while true
+do
+show_menu
+done
