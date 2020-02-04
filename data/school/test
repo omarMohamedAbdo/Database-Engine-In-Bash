@@ -1,0 +1,5 @@
+#!/bin/bash
+line=5
+column=2
+var=$(awk -F '[:]' -v line="$line" -v col="$column" 'NR == line { print $col }' < ".Adhams.metadata")
+echo "Extracted the value: $var"

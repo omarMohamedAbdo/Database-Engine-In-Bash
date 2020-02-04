@@ -1,0 +1,3 @@
+#!/bin/bash
+line= awk -F '[:;]' 'NR==5' .Adhams.metadata
+echo $line
