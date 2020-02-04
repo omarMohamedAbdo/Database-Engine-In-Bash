@@ -1,8 +1,12 @@
 #!/bin/bash
 Database=${opt}
+Metadata=""
+
 echo $Database
 show_menu(){
-select c in 'List all tables' 'Create new table' 'insert into table' 'Select from table' 'Delete from table' 'Exit'
+columnNo=""
+field=1
+select c in 'List all tables' 'Create new table' 'insert into table' 'Select from table' 'Delete from table' 'Back' 'Exit'
 do
 if [[ $c = "List all tables" ]] 
 then
@@ -15,10 +19,35 @@ echo "please Enter the name of table"
 read name;
 touch $name;
 touch ".$name.metadata";
+Metadata="tableName:$name\n"
+while [[ ! $columnNo =~ ^[0-9]+$ ]]; do
+    echo "please Enter number of columns"
+    read columnNo
+done
+echo 
+
+Metadata+="columnNo:$columnNo\n"
+for ((i = 1 ; i <= $columnNo ; i++)); do
+	while [[ ! $field =~ ^[a-z]+ ]]; do
+	
+    	echo "Enter Name of Field No $i"
+	read field
+	done
+	
+	echo "Enter Field type"
+	read fieldType
+	Metadata+="$field:$fieldType\n"	
+done
+echo -e $Metadata >> .$name.metadata
+cd ..
+cd ..
 break;
 elif [[ $c = "Exit" ]] 
 then
-. ./connectToDatabase 
+exit 
+elif [[ $c = "Back" ]]  
+then
+. ./connectToDatabase
 fi
 done
 }

@@ -1,0 +1,6 @@
+tableName:Adhams
+columnNo:3
+id:int
+name:text
+phone:text
+
