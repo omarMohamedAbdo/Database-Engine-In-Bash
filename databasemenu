@@ -9,6 +9,7 @@ colNames=""
 declare -i found=0
 
 chechTableExist(){
+existingtables=($(ls data/$Database))
 found=0
 while [[ $found -eq 0 ]]; do
 	for i in "${existingtables[@]}"
@@ -150,6 +151,21 @@ echo "Please Enter the table name"
 read tableName
 chechTableExist
 tr  -s ',' '  ' < "data/$Database/$tableName"
+read
+break;
+elif [[ $c = "Delete from table" ]] 
+then
+echo "Please Enter the table name"
+read tableName
+chechTableExist
+echo "Please Enter the row to delete"
+read -r rowNo
+rowNo=$((rowNo+1))
+sed -i "$rowNo"'d' "data/$Database/$tableName"
+if [[ $? -eq 0 ]]
+then
+echo "Deleted Successfully"
+fi 
 read
 break;
 elif [[ $c = "Exit" ]] 
