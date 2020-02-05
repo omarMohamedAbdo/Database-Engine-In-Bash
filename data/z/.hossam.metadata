@@ -1,0 +1,6 @@
+tableName:hossam
+columnNo:3
+id:int
+name:text
+age:int
+

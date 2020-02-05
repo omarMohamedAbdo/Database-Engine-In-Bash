@@ -2,6 +2,8 @@
 Database=${opt}
 Metadata=""
 data=""
+fieldNames=""
+
 validateInt(){
 #value = $1
 while [[ ! $value =~ ^[0-9]+$ ]]; do
@@ -10,15 +12,23 @@ while [[ ! $value =~ ^[0-9]+$ ]]; do
 done
 
 }
+validateNull(){
+#value = $1
+while [[ -z $value ]]; do
+    echo " Incorrect, Input cannot be Null"
+    read value
+done
+}
 validateString(){
 #value = $1
 while [[ ! $value =~ ^[a-z]+  ]]; do
-    echo " Incorrect please Enter Valid String"
+    echo " Incorrect, please Enter Valid String"
     read value
 done
 }
 writeIntoDataFile(){
-echo "hi"
+echo -e $data >> "data/$Database/$tableName"
+echo "Data Entered Succesfully"
 }
 
 takeTableInput(){
@@ -34,19 +44,25 @@ column=1
 colType=2
 colName=$(awk -F '[:]' -v line="$line" -v col="$column" 'NR == line { print $col }' < "data/$Database/.$tableName.metadata")
 colType=$(awk -F '[:]' -v line="$line" -v col="$colType" 'NR == line { print $col }' < "data/$Database/.$tableName.metadata")
-echo " PLease enter the value of $colName field"
+echo "PLease enter the value of $colName field"
 read value;
 if [[ $colType = "int" ]]
 then
 validateInt $value
 elif [[ $colType = "text" ]]
 then
-validateString value
+validateNull $value
 fi
 #=========append to data variable
+if [ $i -eq $colNum ]
+then data+="$value"
+else data+="$value,"
+fi
+value=""
 done
 #======write data into data file=====
 writeIntoDataFile
+data=""
 }
 
 show_menu(){
@@ -58,6 +74,7 @@ do
 if [[ $c = "List all tables" ]] 
 then
 ls  "data/$Database"
+read
 break;
 elif [[ $c = "Create new table" ]] 
 then
@@ -79,12 +96,18 @@ for ((i = 1 ; i <= $columnNo ; i++)); do
 	
     	echo "Enter Name of Field No $i"
 	read field
+		if [ $i -eq $columnNo ]
+		then fieldNames+="$field"
+		else fieldNames+="$field,"
+		fi	
 	done
-	
+		
 	echo "Enter Field type"
 	read fieldType
 	Metadata+="$field:$fieldType\n"	
+	field=""
 done
+echo -e $fieldNames >> $name
 echo -e $Metadata >> .$name.metadata
 cd ..
 cd ..
@@ -92,6 +115,8 @@ break;
 elif [[ $c = "insert into table" ]] 
 then
 takeTableInput
+read
+break;
 elif [[ $c = "Exit" ]] 
 then
 exit 
