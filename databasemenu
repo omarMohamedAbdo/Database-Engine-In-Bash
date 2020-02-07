@@ -8,93 +8,8 @@ existingtables=($(ls data/$Database))
 colNames=""
 declare -i found=0
 
-chechTableExist(){
-existingtables=($(ls data/$Database))
-found=0
-while [[ $found -eq 0 ]]; do
-	for i in "${existingtables[@]}"
-	do
-	  if [[ $tableName == $i ]]
-	  then
-	  found=1
-	  break
-	  else
-	  found=0
-	  fi
-	done
-	#if not found Display Error Message
-	if [[ $found -eq 0 ]]
-	then
-	echo "Table not Found, Please try again"
-	read tableName
-	fi
-done
-}
-validateInt(){
-#value = $1
-while [[ ! $value =~ ^[0-9]+$ ]]; do
-    echo " Incorrect, please Enter Integer Number"
-    read value
-done
-
-}
-validateNull(){
-#value = $1
-while [[ -z $value ]]; do
-    echo " Incorrect, Input cannot be Null"
-    read value
-done
-}
-validateString(){
-#value = $1
-while [[ ! $value =~ ^[a-z]+  ]]; do
-    echo " Incorrect, please Enter Valid String"
-    read value
-done
-}
-writeIntoDataFile(){
-echo -e $data >> "data/$Database/$tableName"
-echo "Data Entered Succesfully"
-}
-
-takeTableInput(){
-let line=2
-column=2
-echo "please Enter the name of table"
-read tableName;
-chechTableExist
-colNum=$(awk -F '[:]' -v line="$line" -v col="$column" 'NR == line { print $col }' < "data/$Database/.$tableName.metadata")
-for (( i = 1 ; i <= $colNum ; i++ )); do
-let line=line+1
-column=1
-colType=2
-colName=$(awk -F '[:]' -v line="$line" -v col="$column" 'NR == line { print $col }' < "data/$Database/.$tableName.metadata")
-colType=$(awk -F '[:]' -v line="$line" -v col="$colType" 'NR == line { print $col }' < "data/$Database/.$tableName.metadata")
-colNames+="$colName"
-echo "PLease enter the value of $colName field"
-read value;
-if [[ $colType = "int" ]]
-then
-validateInt $value
-elif [[ $colType = "text" ]]
-then
-validateNull $value
-fi
-#=========append to data variable
-if [ $i -eq $colNum ]
-then data+="$value"
-else data+="$value,"
-fi
-value=""
-done
-#======write data into data file=====
-writeIntoDataFile
-data=""
-}
-
 show_menu(){
 clear
-
 columnNo=""
 field=1
 select c in 'List all tables' 'Create new table' 'insert into table' 'print table data' 'Delete from table' 'Back' 'Exit'
@@ -108,40 +23,51 @@ elif [[ $c = "Create new table" ]]
 then
 cd "data/$Database"
 echo "please Enter the name of table"
+while [[ true ]]; do
 read name;
-touch $name;
-touch ".$name.metadata";
+FILE="$name"
+if [ -f "$FILE" ]; then
+    echo "This table already created, Please Enter another name"
+   		
+else 
+    touch $name;
+    touch ".$name.metadata";
+	break;	
+fi
+done
 Metadata="tableName:$name\n"
 while [[ ! $columnNo =~ ^[0-9]+$ ]]; do
     echo "please Enter number of columns"
     read columnNo
 done
 echo 
-
 Metadata+="columnNo:$columnNo\n"
 for ((i = 1 ; i <= $columnNo ; i++)); do
 	while [[ ! $field =~ ^[a-z]+ ]]; do
 	
-    	echo "Enter Name of Field No $i"
+    	echo "Enter Name of Field Number $i"
 	read field
 		if [ $i -eq $columnNo ]
 		then fieldNames+="$field"
 		else fieldNames+="$field,"
 		fi	
-	done
-		
-	echo "Enter Field type"
-	read fieldType
-	Metadata+="$field:$fieldType\n"	
+	done		
+	echo "Choose Field type"
+	select opt in "Integer" "Text" ; do 
+	Metadata+="$field:$opt\n"
+	break;	
+	done 	
 	field=""
 done
 echo -e $fieldNames >> $name
 echo -e $Metadata >> .$name.metadata
+echo "The table is created successfully" 
 cd ..
 cd ..
 break;
 elif [[ $c = "insert into table" ]] 
 then
+. ./readandwriteoperations
 takeTableInput
 read
 break;
@@ -149,6 +75,7 @@ elif [[ $c = "print table data" ]]
 then
 echo "Please Enter the table name"
 read tableName
+. ./validationFuncs
 chechTableExist
 tr  -s ',' '  ' < "data/$Database/$tableName"
 read
@@ -157,10 +84,11 @@ elif [[ $c = "Delete from table" ]]
 then
 echo "Please Enter the table name"
 read tableName
+. ./validationFuncs
 chechTableExist
 echo "Please Enter the row to delete"
 read -r rowNo
-rowNo=$((rowNo+1))
+rowNo=$((rowNo))
 sed -i "$rowNo"'d' "data/$Database/$tableName"
 if [[ $? -eq 0 ]]
 then

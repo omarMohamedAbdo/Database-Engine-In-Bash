@@ -1,0 +1,5 @@
+tableName:pps
+columnNo:2
+id:Integer
+name:Text
+

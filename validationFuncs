@@ -1,0 +1,46 @@
+#!/bin/bash
+
+chechTableExist(){
+existingtables=($(ls data/$Database))
+found=0
+while [[ $found -eq 0 ]]; do
+	for i in "${existingtables[@]}"
+	do
+	  if [[ $tableName == $i ]]
+	  then
+	  found=1
+	  break
+	  else
+	  found=0
+	  fi
+	done
+	#if not found Display Error Message
+	if [[ $found -eq 0 ]]
+	then
+	echo "Table not Found, Please try again"
+	read tableName
+	fi
+done
+}
+validateInt(){
+#value = $1
+while [[ ! $value =~ ^[0-9]+$ ]]; do
+    echo "Incorrect, please Enter Integer Number"
+    read value
+done
+
+}
+validateNull(){
+#value = $1
+while [[ -z $value ]]; do
+    echo "Incorrect, Input cannot be Null"
+    read value
+done
+}
+validateString(){
+#value = $1
+while [[ ! $value =~ ^[a-z]+  ]]; do
+    echo "Incorrect, please Enter Valid String"
+    read value
+done
+}

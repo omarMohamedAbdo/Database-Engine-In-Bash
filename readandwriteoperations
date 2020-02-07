@@ -1,0 +1,45 @@
+#!/bin/bash
+
+writeIntoDataFile(){
+echo -e $data >> "data/$Database/$tableName"
+echo "Data Entered Succesfully"
+}
+
+takeTableInput(){
+let line=2
+column=2
+echo "please Enter the name of table"
+read tableName;
+. ./validationFuncs
+chechTableExist
+colNum=$(awk -F '[:]' -v line="$line" -v col="$column" 'NR == line { print $col }' < "data/$Database/.$tableName.metadata")
+for (( i = 1 ; i <= $colNum ; i++ )); do
+let line=line+1
+column=1
+colType=2
+colName=$(awk -F '[:]' -v line="$line" -v col="$column" 'NR == line { print $col }' < "data/$Database/.$tableName.metadata")
+colType=$(awk -F '[:]' -v line="$line" -v col="$colType" 'NR == line { print $col }' < "data/$Database/.$tableName.metadata")
+colNames+="$colName"
+echo "PLease enter the value of $colName field"
+read value;
+if [[ $colType = "Integer" ]]
+then
+. ./validationFuncs
+validateInt $value
+elif [[ $colType = "Text" ]]
+then
+. ./validationFuncs
+validateNull $value
+fi
+#=========append to data variable
+if [ $i -eq $colNum ]
+then data+="$value"
+else data+="$value,"
+fi
+value=""
+done
+#======write data into data file=====
+writeIntoDataFile
+data=""
+}
+

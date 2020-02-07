@@ -11,9 +11,18 @@ ls data
 break;
 elif [[ $c = "Create new database" ]] 
 then
-echo "Enter database name"
+echo "Please enter database name"
+while [[ true ]]; do
 read dbName;
-mkdir "data/$dbName"
+directory="data/$dbName"
+if [ -d "$directory" ]; then
+    echo "This database is already created, Please Enter another name"
+   		
+else 
+    mkdir "data/$dbName"
+	break;	
+fi
+done
 break;
 elif [[ $c = "connect to database" ]] 
 then
