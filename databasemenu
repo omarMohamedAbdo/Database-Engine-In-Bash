@@ -6,11 +6,13 @@ fieldNames=""
 tableNames=`ls data/$Database`
 existingtables=($(ls data/$Database))
 colNames=""
+columnNames=""
 declare -i found=0
 
 show_menu(){
 clear
 columnNo=""
+columnNames=""
 field=1
 select c in 'List all tables' 'Create new table' 'insert into table' 'print table data' 'Delete from table' 'Back' 'Exit'
 do
@@ -30,8 +32,7 @@ if [ -f "$FILE" ]; then
     echo "This table already created, Please Enter another name"
    		
 else 
-    touch $name;
-    touch ".$name.metadata";
+    
 	break;	
 fi
 done
@@ -47,9 +48,16 @@ for ((i = 1 ; i <= $columnNo ; i++)); do
 	
     	echo "Enter Name of Field Number $i"
 	read field
+for  f in $columnNames; do
+	while [[ $f = $field ]]; do
+	echo "Duplication for column name, please enter another name"	
+	read field
+done 
+done
 		if [ $i -eq $columnNo ]
 		then fieldNames+="$field"
 		else fieldNames+="$field,"
+		columnNames+="$field"
 		fi	
 	done		
 	echo "Choose Field type"
@@ -59,8 +67,11 @@ for ((i = 1 ; i <= $columnNo ; i++)); do
 	done 	
 	field=""
 done
+touch $name;
+touch ".$name.metadata";
 echo -e $fieldNames >> $name
 echo -e $Metadata >> .$name.metadata
+columnNames=""
 echo "The table is created successfully" 
 cd ..
 cd ..
