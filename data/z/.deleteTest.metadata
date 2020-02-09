@@ -1,0 +1,5 @@
+tableName:deleteTest
+columnNo:2
+id:Integer
+name:Text
+

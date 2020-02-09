@@ -44,4 +44,18 @@ while [[ ! $value =~ ^[a-z]+  ]]; do
     read value
 done
 }
+TableDuplicationAndNullValidation(){
+while true; 
+do
+	read name
+	if [[ -f $name ]]; then
+	    echo "This table already created,Please Enter another name"
+	elif [[ -z $name ]]; then
+	    echo "Table Name Connot be empty,Please Enter a Valid Name"
+	else   
+	   break	
+	fi
+name=""
+done
+}
 

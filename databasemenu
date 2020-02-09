@@ -8,6 +8,7 @@ existingtables=($(ls data/$Database))
 colNames=""
 columnNames=""
 declare -i found=0
+declare -i TableRowCount=0
 
 show_menu(){
 clear
@@ -25,17 +26,8 @@ elif [[ $c = "Create new table" ]]
 then
 cd "data/$Database"
 echo "please Enter the name of table"
-while [[ true ]]; do
-read name;
-FILE="$name"
-if [ -f "$FILE" ]; then
-    echo "This table already created, Please Enter another name"
-   		
-else 
-    
-	break;	
-fi
-done
+. ./../../validationFuncs
+TableDuplicationAndNullValidation
 Metadata="tableName:$name\n"
 while [[ ! $columnNo =~ ^[0-9]+$ ]]; do
     echo "please Enter number of columns"
@@ -75,6 +67,7 @@ columnNames=""
 echo "The table is created successfully" 
 cd ..
 cd ..
+read
 break;
 elif [[ $c = "insert into table" ]] 
 then
@@ -97,10 +90,17 @@ echo "Please Enter the table name"
 read tableName
 . ./validationFuncs
 chechTableExist
+TableRowCount=($(< "data/$Database/$tableName" wc -l)-1)
 echo "Please Enter the row to delete"
 read -r rowNo
 rowNo=$((rowNo))
-sed -i "$rowNo"'d' "data/$Database/$tableName"
+while [[ $rowNo -gt TableRowCount || $rowNo -le 0 || ! $rowNo =~ ^[0-9]+$ ]];do
+	 echo "Invalid row Number,Enter a Valid one"
+	 read -r rowNo
+	 rowNo=$((rowNo))
+done
+declare -i lineToDelete=($rowNo+1)
+sed -i "$lineToDelete"'d' "data/$Database/$tableName"
 if [[ $? -eq 0 ]]
 then
 echo "Deleted Successfully"
